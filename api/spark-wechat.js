@@ -85,6 +85,7 @@ const emojiObj = {
   "/:li": "闪电劈你"
 };
 const keywordAutoReply = parseAndAssign("{}")
+// const keywordAutoReply = parseAndAssign(process.env.KEYWORD_REPLAY)
 module.exports = async function (request, response) {
   const method = request.method;
   const timestamp = request.query.timestamp;
@@ -101,7 +102,7 @@ module.exports = async function (request, response) {
       response.status(200).send(echostr);
       return;
     } else {
-      response.status(200).send("failed");
+      response.status(200).send("failed" +process.env.KEYWORD_REPLAY);
       return;
     }
   }
