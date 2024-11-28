@@ -84,6 +84,7 @@ const emojiObj = {
   "/:cake": "蛋糕",
   "/:li": "闪电劈你"
 };
+console.log(process.env.KEYWORD_REPLAY)
 const keywordAutoReply = parseAndAssign(process.env.KEYWORD_REPLAY)
 module.exports = async function (request, response) {
   const method = request.method;
