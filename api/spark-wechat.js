@@ -101,7 +101,7 @@ module.exports = async function (request, response) {
       response.status(200).send(echostr);
       return;
     } else {
-      response.status(200).send("failed!!!" + process.env.HOST_URL);
+      response.status(200).send("failed");
       return;
     }
   }
@@ -199,7 +199,7 @@ module.exports = async function (request, response) {
     userChatHistory[FromUserName] = [];
   }
   userChatHistory[FromUserName].push({ Role: 'user', Content });
-  console.log("会话历史："， userChatHistory);
+  console.log("会话历史：", userChatHistory);
   const data = genParams(userChatHistory[FromUserName]);
 
   const connect = await getConnect();
@@ -208,20 +208,13 @@ module.exports = async function (request, response) {
   let answer = '';
   let timeout;
   const done = new Promise((resolve) => {
-    connect.on('message'， (msg) => {
-      console.log('接受到WebSocket消息:', msg); // 打印收到的 WebSocket 消息
+    connect.on('message', (msg) => {
       const data = JSON.parse(msg);
-      console.log('WebSocket消息解析:', data); // 打印解析后的对象
-      const payload = data.payload  || {};
-      const choices = payload.choices || null;
+      const payload = data.payload;
+      const choices = payload.choices;
       const header = data.header;
       const code = header.code;
-      
-      if (!choices) {
-          console.error('Invalid response payload or missing choices:', payload);
-          return; // 忽略无效数据
-      }
-      
+
       if (code !== 0) {
         console.log(payload);
         return;
@@ -297,7 +290,7 @@ function genParams(messages) {
       chat: {
         domain: process.env.SPARK_DOMAIN,
         temperature: 0.8,
-        到p_k: 6,
+        top_k: 6,
         max_tokens: 2048,
         auditing: 'default',
       },
@@ -343,32 +336,13 @@ function hmacWithShaTobase64(algorithm, data, key) {
   const encodeData = hmac.digest();
   return Buffer.from(encodeData).toString('base64');
 }
-
 function parseAndAssign(jsonString) {
-    // 初始化空对象
-    const resultObject = {};
-
-    // 输入校验与 JSON 解析
-    if (typeof jsonString === 'string') {
-        try {
-            parsedObject = JSON.parse(jsonString); // 尝试解析 JSON 字符串
-        } catch (error) {
-            console.warn('Invalid JSON string, returning empty object');
-            return resultObject; // 返回空对象
-        }
-    } else if (typeof jsonString === 'object' && jsonString !== null) {
-        parsedObject = jsonString; // 如果是对象直接使用
-    } else {
-        console.warn('Input is not a valid JSON string or object, returning empty object');
-        return resultObject; // 非法输入返回空对象
-    }
-
-    // 拆分键值对并处理
-    Object.entries(parsedObject).forEach(([compoundKey, value]) => {
-        compoundKey.split(',').forEach((key) => {
-            resultObject[key.trim()] = value;
-        });
-    });
-
-    return resultObject;
+  const parsedObject = JSON.parse(jsonString);
+  const resultObject = {};
+  Object.entries(parsedObject).forEach(([compoundKey, value]) => {
+      compoundKey.split(',').forEach(key => {
+          resultObject[key.trim()] = value;
+      });
+  });
+  return resultObject;
 }
