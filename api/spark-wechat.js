@@ -102,7 +102,7 @@ module.exports = async function (request, response) {
       response.status(200).send(echostr);
       return;
     } else {
-      response.status(200).send("failed" +process.env.KEYWORD_REPLAY);
+      response.status(200).send("failed!!!" + process.env.KEYWORD_REPLAY);
       return;
     }
   }
