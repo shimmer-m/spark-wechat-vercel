@@ -84,8 +84,7 @@ const emojiObj = {
   "/:cake": "蛋糕",
   "/:li": "闪电劈你"
 };
-const keywordAutoReply = parseAndAssign("{}")
-// const keywordAutoReply = parseAndAssign(process.env.KEYWORD_REPLAY)
+const keywordAutoReply = parseAndAssign(process.env.KEYWORD_REPLAY)
 module.exports = async function (request, response) {
   const method = request.method;
   const timestamp = request.query.timestamp;
@@ -102,7 +101,7 @@ module.exports = async function (request, response) {
       response.status(200).send(echostr);
       return;
     } else {
-      response.status(200).send("failed!!!" + process.env.KEYWORD_REPLAY);
+      response.status(200).send("failed!!!" + process.env.HOST_URL);
       return;
     }
   }
@@ -338,8 +337,26 @@ function hmacWithShaTobase64(algorithm, data, key) {
   return Buffer.from(encodeData).toString('base64');
 }
 function parseAndAssign(jsonString) {
-  const parsedObject = JSON.parse(jsonString);
+  // 初始化空对象
   const resultObject = {};
+
+  let parsedObject;
+
+  // 输入校验与 JSON 解析
+  if (typeof input === 'string') {
+      try {
+          parsedObject = JSON.parse(input); // 尝试解析 JSON 字符串
+      } catch (error) {
+          console.warn('Invalid JSON string, returning empty object');
+          return resultObject; // 返回空对象
+      }
+  } else if (typeof input === 'object' && input !== null) {
+      parsedObject = input; // 如果是对象直接使用
+  } else {
+      console.warn('Input is not a valid JSON string or object, returning empty object');
+      return resultObject; // 非法输入返回空对象
+  }
+
   Object.entries(parsedObject).forEach(([compoundKey, value]) => {
       compoundKey.split(',').forEach(key => {
           resultObject[key.trim()] = value;
