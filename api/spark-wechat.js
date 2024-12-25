@@ -203,6 +203,7 @@ module.exports = async function (request, response) {
   const data = genParams(userChatHistory[FromUserName]);
 
   const connect = await getConnect();
+  console.log("会话发送内容：", userChatHistory);
   connect.send(JSON.stringify(data));
 
   let answer = '';
