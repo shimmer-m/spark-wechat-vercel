@@ -210,6 +210,7 @@ module.exports = async function (request, response) {
   const done = new Promise((resolve) => {
     connect.on('message', (msg) => {
       const data = JSON.parse(msg);
+      console.log("消息内容：", data);
       const payload = data.payload;
       const choices = payload.choices;
       const header = data.header;
